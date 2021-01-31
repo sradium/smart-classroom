@@ -3,9 +3,6 @@
  *
  *  This is a library for stepper motor series with L297 driver and harware clock.
  *
- *  Adafruit invests time and resources providing this open source code,
- *  please support Adafruit andopen-source hardware by purchasing products
- *  from Adafruit!
  *
  *  Written by sradium.
  *

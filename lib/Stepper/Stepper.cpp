@@ -5,14 +5,7 @@
  *
  *  @section intro_sec Introduction TODO: Change description
  *
- *  This is a library for DHT series of low cost temperature/humidity sensors.
  *
- *  You must have Adafruit Unified Sensor Library library installed to use this
- * class.
- *
- *  Adafruit invests time and resources providing this open source code,
- *  please support Adafruit andopen-source hardware by purchasing products
- *  from Adafruit!
  *
  *  @section author Author
  *

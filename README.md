@@ -21,15 +21,48 @@ Con la finalidad de adaptar el sistema a las distintas características de los s
         "mac": [222, 237, 186, 254, 254, 237],
         "broker":"broker.hivemq.com",
         "client_id":"A1314",
+        "intervarl_publish_min": 5,
         "port": 1883
     },
-    "illumination_scene":{
-        "setpoint": 300,
-        "highest": 100,
-        "high": 70,
-        "medium": 45,
-        "low": 10
-    }
+    "illumination":{
+        "timer_to_off_min": 15,
+        "scenes":{
+            "setpoint": 300,
+            "highest": 100,
+            "high": 70,
+            "medium": 45,
+            "low": 10
+        }
+    },
+    "FireEquipment":[
+        {
+            "name": "emergency lever",
+            "type": "sensor",
+            "mode": "NO",
+            "terminal": "FI1",
+            "debounce_seg": 0.5
+        },
+        {
+            "name": "smoke detector",
+            "type": "sensor",
+            "mode": "NO",
+            "terminal": "FI2",
+            "debounce_seg": 5
+        },
+        {
+            "name": "smoke detector 2",
+            "type": "sensor",
+            "mode": "NO",
+            "terminal": "FI3",
+            "debounce_seg": 5
+        },
+        {
+            "name": "Siren",
+            "type": "actuator",
+            "mode": "NO",
+            "terminal": "FO1"
+        }
+    ]
 }
 ```
 
@@ -46,7 +79,7 @@ Para ello, se planteó la siguiente arquitectura: cada salón que conforma este 
 
 ## Estado del salón
 
-Publicación de los niveles de iluminación de cada lazo de control de las luminarias del salón.
+Publicación del estado del salón que rige el funcionamiento del sistema. Cuando la variable `occupied` esté en `true` las luces estarán encendidas en la escena automatica o la seleccionada por el usuario por detectarse presencia en el salón, de caso contrario será `false`. Cuando la variable `fire_alarm` esté en `true` los detectores de humo percibieron un incendio o se activo la palanca de emergencia. La variable `projection_mode` determina si el video beam está activado y la escena de proyección está activa, en este modo las persionas estaran abajo, las luminarias marcadas en el archivo de configuración estarán apagadas y las que no estarán encendidas para aportar 100 lux en el salón.
 
 **TOPIC** : `A1314/OUT/STATUS`
 
@@ -188,16 +221,16 @@ Publicación de nivel de humedad relativa promedio del salón y el registrado po
         "value": 65
     },
     "s3": {
-        "value": 64.1
+        "value": 64.9
     },
     "s4": {
           "value": 65
     },
     "s5": {
-        "value": 64.1
+        "value": 64.9
     },
     "s6": {
-        "value": 200
+        "value": 65
     }
 }
 ```
@@ -210,7 +243,7 @@ Todos los salones cuentan con ocho escenas de iluminación. La primera es la esc
 
 Las otras escenas permiten al usuario escoger de forma manual cuatro niveles de regulación según el porcentaje de potencia de la lumninaria dentro del rango 0 a 100 %. Es importante respetar el orden descendente establecido, es decir si en la escena `high` tiene el valor de 70 y se quiere cambiar el valor de la escena `medium` a 80 el mensaje de configuración será ignorado.
 
-**TOPIC** : `A1314/CFG/ILLUM`
+**TOPIC** : `A1314/CFG/ILLUM/SCENE`
 
 **QoS** : 1
 
@@ -222,6 +255,21 @@ Las otras escenas permiten al usuario escoger de forma manual cuatro niveles de 
     "high": 70,
     "medium": 45,
     "low": 10
+}
+```
+
+## Configuración del tiempo de apagado
+
+En el momento en el que **todos** los sensores de presencia dejen de estar activos, se iniciará el timer para el apagado de las luminarias. Si se detecta movimiento antes de que se haya acabado el tiempo este se reinicia. 
+
+**TOPIC** : `A1314/CFG/ILLUM/DELAY`
+
+**QoS** : 1
+
+**Message** : 
+```json
+{
+    "timer_to_off_min": 15,
 }
 ```
 
