@@ -121,6 +121,15 @@ LigthControler::LigthControler(JsonObject illuminationEquipment)
     levelLighting.low = illuminationEquipment_scenes["low"];
 
     _projectorAvaliable = illuminationEquipment["projector"];
+    if (_projectorAvaliable)
+    {
+        projectionScreen = Curtain(
+            projectorPinout.PLSU,
+            projectorPinout.PLSB,
+            projectorPinout.PSMP,
+            projectorPinout.PSMD
+        );
+    }
 
     int index = 0;
     for (JsonVariant elem : illuminationEquipment["pir"].as<JsonArray>())

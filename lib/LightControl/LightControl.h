@@ -14,6 +14,7 @@
 #include <ArduinoJson.h>
 #include "LightLoop.h"
 #include "Button.h"
+#include "Curtain.h"
 
 enum sensorTerminals
 {
@@ -59,6 +60,24 @@ struct scenes
     int low;
 };
 
+
+/*
+* Estructura con la asiganción de pines para el projector:
+* PP1 = Projector LDR Input
+* PLSU = Projector limit switch upper
+* PLSB = Projector limit switch Botom
+* PSM = Projector stepper motor power
+* PSMD = Projector stepper motor direction
+*/
+struct projector
+{
+    int PI = 18;
+    int PLSU = 19;
+    int PLSB = 20;
+    int PSMP = 21;
+    int PSMD = 22;
+};
+
 class LigthControler
 {
 public:
@@ -75,9 +94,11 @@ private:
     bool _projectorAvaliable;
     bool _lastState;
     scenes levelLighting;
+    projector projectorPinout;
     Button ldr;
     Button PIRs[3];
     Loop loops[8];
+    Curtain projectionScreen;
 };
 
 #endif

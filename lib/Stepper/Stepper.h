@@ -13,19 +13,21 @@
 
 #include "Arduino.h"
 
-class STEPPER
+class Stepper
 {
 public:
-    STEPPER(int8_t pin_on, int8_t pin_dir);
+    Stepper();
+    Stepper(int pin_on, int pin_dir);
     void begin();
-    bool start_move(bool condition);
-    bool stop_move(bool condition);
-    void change_direction();
-    bool is_stop();
+    bool startMove();
+    bool stopMove();
+    void changeDirection();
+    void setDirection(uint8_t dir);
+    bool isStop();
 private:
-    int8_t _pin_on; 
-    int8_t _pin_dir; 
-    bool is_move; 
+    int _pinOn; 
+    int _pinDir; 
+    bool isMove; 
     uint8_t down;
 };
 

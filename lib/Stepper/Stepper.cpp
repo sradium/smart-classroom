@@ -15,49 +15,60 @@
 
 #include "Stepper.h"
 
-STEPPER::STEPPER(int8_t pin_on, int8_t pin_dir) {
-    _pin_on = pin_on;
-    _pin_dir = pin_dir;
-    is_move = false; 
+Stepper::Stepper(int pin_on, int pin_dir) {
+    _pinOn = pin_on;
+    _pinDir = pin_dir;
+    isMove = false; 
     down = LOW;
 }
 
-void STEPPER::begin(){
-    pinMode(_pin_on, OUTPUT);
-    pinMode(_pin_dir, OUTPUT);
-    digitalWrite(_pin_on, LOW);
-    digitalWrite(_pin_dir, down);
+Stepper::Stepper()
+{
+    
 }
 
-bool STEPPER::start_move(bool condition) {
-    if(condition && !is_move){
-        digitalWrite(_pin_on, HIGH);
-        is_move = true;
+void Stepper::begin(){
+    pinMode(_pinOn, OUTPUT);
+    pinMode(_pinDir, OUTPUT);
+    digitalWrite(_pinOn, LOW);
+    digitalWrite(_pinDir, down);
+}
+
+bool Stepper::startMove() {
+    if(!isMove){
+        digitalWrite(_pinOn, HIGH);
+        isMove = true;
         return true;
     } else {
         return false;
     }
 }
 
-void STEPPER::change_direction(){
+void Stepper::changeDirection(){
     if(down == HIGH){
         down = LOW;
     } else {
         down = HIGH;
     }
-    digitalWrite(_pin_dir, down);
+    digitalWrite(_pinDir, down);
 }
 
-bool STEPPER::stop_move(bool condition){
-    if (condition && is_move){
-        digitalWrite(_pin_on, LOW);
-        is_move = false;
+void Stepper::setDirection(uint8_t dir)
+{
+    down = dir;
+    digitalWrite(_pinDir, down);
+}
+
+bool Stepper::stopMove(){
+    if (isMove){
+        digitalWrite(_pinOn, LOW);
+        isMove = false;
         return true;
     } else {
         return false;
     }
 }
 
-bool STEPPER::is_stop(){
-    return !is_move;
+bool Stepper::isStop(){
+    return !isMove;
 }
