@@ -24,15 +24,75 @@ Con la finalidad de adaptar el sistema a las distintas características de los s
         "intervarl_publish_min": 5,
         "port": 1883
     },
-    "illumination":{
-        "timer_to_off_min": 15,
+    "illuminationEquipment":{
+        "off_delay_min": 15,
         "scenes":{
             "setpoint": 300,
             "highest": 100,
             "high": 70,
             "medium": 45,
             "low": 10
-        }
+        },
+        "projector": true,
+        "pir": ["LP1", "LP2", "LP3"],
+        "loops":[
+            {
+                "terminal": "LL1",
+                "priority": false,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": "LL2",
+                "priority": false,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": "LL3",
+                "priority": false,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": "LL4",
+                "priority": false,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": "LL5",
+                "priority": true,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": "LL6",
+                "priority": true,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": "LL7",
+                "priority": true,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": "LL8",
+                "priority": true,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            }
+        ]
     },
     "FireEquipment":[
         {

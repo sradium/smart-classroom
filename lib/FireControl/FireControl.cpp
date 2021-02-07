@@ -29,15 +29,28 @@ terminals convertFromStrTerminal(String terminal)
         return FI5;
     else if (terminal == "FI6")
         return FI6;
+    else
+        return FI0;
+}
+
+FireControler::FireControler(JsonArray FireEquipment)
+{
+    init(FireEquipment);
 }
 
 FireControler::FireControler(JsonArray FireEquipment, void (*callback)())
 {
+    init(FireEquipment);
+    _callback = callback;
+    _isCallback = true;
+}
+
+void FireControler::init(JsonArray FireEquipment)
+{
     int sensorIndex = 0;
     int actuatorIndex = 0;
-    for(JsonVariant value : FireEquipment)
+    for(JsonObject equipment : FireEquipment)
     {
-        JsonObject equipment = value.as<JsonObject>();
         if (equipment["type"] == "sensor")
         {
             if (sensorIndex < 6)
@@ -45,7 +58,7 @@ FireControler::FireControler(JsonArray FireEquipment, void (*callback)())
                 _sensors[sensorIndex] = Button(
                     static_cast<int>(convertFromStrTerminal(equipment["terminal"])),
                     convertFromStrToLogic(equipment["mode"]),
-                    equipment["debounce_seg"] * 1000
+                    (static_cast<long>(equipment["debounce_seg"]) * 1000)
                 );
                 sensorIndex++;
             }else
@@ -67,8 +80,8 @@ FireControler::FireControler(JsonArray FireEquipment, void (*callback)())
             }
         } else {
         }
-        _callback = callback;
     }
+    _isCallback = false;
 }
 
 void FireControler::superviseSensors()
@@ -107,7 +120,10 @@ void FireControler::activateAlarm()
     {
         _actuators[i].turnOn();
     }
-    _callback();
+    if (_isCallback)
+    {
+        _callback();
+    }
 }
 
 void FireControler::deactivateAlarm()

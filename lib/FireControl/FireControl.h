@@ -17,6 +17,7 @@
 
 enum terminals
 {
+    FI0 = 0,
     FI1 = 13,
     FI2 = 12,
     FI3 = 11,
@@ -33,6 +34,8 @@ terminals convertFromStrTerminal(String terminal);
 class FireControler
 {
 public:
+    FireControler() {}
+    FireControler(JsonArray FireEquipment);
     FireControler(JsonArray FireEquipment, fuction callback);
     void superviseSensors();
     void activateAlarm();
@@ -40,6 +43,8 @@ public:
     bool fireAlarm = false;
 
 private:
+    void init(JsonArray FireEquipment);
+    bool _isCallback;
     fuction _callback;
     Button _sensors[6] = {};
     Relay _actuators[3] = {};

@@ -4,16 +4,7 @@
 #include <Ethernet.h>
 #include <PubSubClient.h>
 #include <FireControl.h>
-
-
-bool occupied = false;
-bool projection_mode = false;
-
-int setpoint = 300;
-int highest = 100;
-int high = 70;
-int medium = 45;
-int low = 0;
+#include <LightControl.h>
 
 unsigned long last_publish;
 unsigned long interval_publish;
@@ -21,7 +12,7 @@ unsigned long interval_publish;
 // TODO: Convertir todas estas variables para ser configuradas de forma dinámica
 byte mac[] = {0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED};
 IPAddress ip(192, 168, 0, 135);
-IPAddress myDns(300, 44, 32, 12);
+IPAddress myDns(8, 8, 8, 8);
 const char *server = "broker.hivemq.com";
 const char *client_id = "A1314";
 int port = 1883;
@@ -30,7 +21,7 @@ EthernetClient ethClient;
 PubSubClient mqttClient(ethClient);
 
 FireControler fireControler;
-
+LigthControler ligthControler;
 
 void on_message(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
@@ -46,6 +37,9 @@ void on_message(char* topic, byte* payload, unsigned int length) {
 void setup()
 {
   Serial.begin(9600);
+
+  fireControler = FireControler();
+  ligthControler = LigthControler();
 
   Serial.println("Initialize Ethernet with DHCP:");
   Ethernet.init(53);
@@ -105,9 +99,9 @@ void report_status(){
   char payload [300];
   DynamicJsonDocument doc(24);
 
-  doc["occupied"] = occupied;
   doc["fire_alarm"] = fireControler.fireAlarm;
-  doc["projection_mode"] = projection_mode;
+  doc["occupied"] = ligthControler.occupied;
+  doc["projection_mode"] = ligthControler.projectionOn;
 
   serializeJson(doc, payload);
   sprintf(topic, "%s/OUT/STATUS", client_id);
@@ -198,9 +192,10 @@ void report_co2(){
 
 
 void loop()
-{
+{ 
+  fireControler.superviseSensors();
+  ligthControler.superviseLoops();
 
-  
   if (!mqttClient.connected()) {
     reconnect();
   } else {
