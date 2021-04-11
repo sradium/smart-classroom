@@ -15,102 +15,82 @@
 
 #include "LightControl.h"
 
-sensorTerminals convertSensorTerminalFromStr(String terminal)
+static const uint8_t convertSensorTerminal(int terminal)
 {
-    if (terminal == "LL1")
+    if (terminal == 1)
     {
-        return LLS1;
+        return A8;
     }
-    else if (terminal == "LL2")
+    else if (terminal == 2)
     {
-        return LLS2;
+        return A9;
     }
-    else if (terminal == "LL3")
+    else if (terminal == 3)
     {
-        return LLS3;
+        return A10;
     }
-    else if (terminal == "LL4")
+    else if (terminal == 4)
     {
-        return LLS4;
+        return A11;
     }
-    else if (terminal == "LL5")
+    else if (terminal == 5)
     {
-        return LLS5;
+        return A12;
     }
-    else if (terminal == "LL6")
+    else if (terminal == 6)
     {
-        return LLS6;
+        return A13;
     }
-    else if (terminal == "LL7")
+    else if (terminal == 7)
     {
-        return LLS7;
-    }
-    else if (terminal == "LL8")
-    {
-        return LLS8;
+        return A14;
     }
     else
     {
-        return LLS0;
+        return A15;
     }
 }
 
-loopTerminals convertLoopTerminalFromStr(String terminal)
+int convertLoopTerminal(int terminal)
 {
-    if (terminal == "LL1")
+    if (terminal == 1)
     {
-        return LL1;
+        return 0x60;
     }
-    else if (terminal == "LL2")
+    else if (terminal == 2)
     {
-        return LL2;
+        return 0x61;
     }
-    else if (terminal == "LL3")
+    else if (terminal == 3)
     {
-        return LL3;
+        return 0x62;
     }
-    else if (terminal == "LL4")
+    else if (terminal == 4)
     {
-        return LL4;
+        return 0x63;
     }
-    else if (terminal == "LL5")
+    else if (terminal == 5)
     {
-        return LL5;
+        return 0x64;
     }
-    else if (terminal == "LL6")
+    else if (terminal == 6)
     {
-        return LL6;
+        return 0x65;
     }
-    else if (terminal == "LL7")
+    else if (terminal == 7)
     {
-        return LL7;
-    }
-    else if (terminal == "LL8")
-    {
-        return LL8;
+        return 0x66;
     }
     else
     {
-        return LL0;
+        return 0x67;
     }
-}
-
-pirTerminals convertPirTerminalFromStr(String terminal)
-{
-    if (terminal == "LP1")
-        return LP1;
-    else if (terminal == "LP2")
-        return LP2;
-    else if (terminal == "LP3")
-        return LP3;
-    else if (terminal == "LP4")
-        return LP4;
-    else
-        return LP0;
 }
 
 LigthControler::LigthControler(JsonObject illuminationEquipment)
 {
+    Serial.println("Creating illumination equipment");
+
     _delayOff = illuminationEquipment["off_delay_min"];
 
     JsonObject illuminationEquipment_scenes = illuminationEquipment["scenes"];
@@ -119,6 +99,8 @@ LigthControler::LigthControler(JsonObject illuminationEquipment)
     levelLighting.high = illuminationEquipment_scenes["high"];
     levelLighting.medium = illuminationEquipment_scenes["medium"];
     levelLighting.low = illuminationEquipment_scenes["low"];
+
+    Serial.println("\tCreating projector curtain");
 
     _projectorAvaliable = illuminationEquipment["projector"];
     if (_projectorAvaliable)
@@ -129,7 +111,11 @@ LigthControler::LigthControler(JsonObject illuminationEquipment)
             projectorPinout.PSMP,
             projectorPinout.PSMD
         );
+
+        ldr = Button(projectorPinout.PinI, false);
     }
+
+    Serial.println("\tCreating PIR devices");
 
     int index = 0;
     for (JsonVariant elem : illuminationEquipment["pir"].as<JsonArray>())
@@ -137,14 +123,17 @@ LigthControler::LigthControler(JsonObject illuminationEquipment)
         if (index < 3)
         {
             PIRs[index] = Button(
-                static_cast<int>(convertPirTerminalFromStr(elem[index])),
+                elem,
                 false);
+            index++;
         }
         else
         {
             Serial.println("Error: por poner descripción");
         }
     }
+
+    Serial.println("\tCreating loop devices");
 
     index = 0;
     for (JsonObject elem : illuminationEquipment["loops"].as<JsonArray>())
@@ -153,28 +142,34 @@ LigthControler::LigthControler(JsonObject illuminationEquipment)
         {
             loops[index] = Loop(
                 &levelLighting.setpoint,
-                static_cast<int>(convertSensorTerminalFromStr(elem["terminal"])),
-                static_cast<int>(convertLoopTerminalFromStr(elem["terminal"])),
+                convertSensorTerminal(elem["terminal"]),
+                convertLoopTerminal(elem["terminal"]),
                 static_cast<int>(elem["kp"]),
                 static_cast<int>(elem["kd"]),
                 static_cast<int>(elem["ki"]),
                 static_cast<bool>(elem["priority"]));
+            index++;
         }
         else
         {
             Serial.println("Error: por poner descripción");
         }
     }
+
+    occupied = false;
+    _lastState = occupied;
+    _startTime = 0;
+    _startTimeProjection = 0;
 };
 
 void LigthControler::superviseLoops()
 {
     bool isOccupied = false;
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
-        isOccupied = PIRs[i].read() | isOccupied;
+        isOccupied = PIRs[i].read() || isOccupied;
     }
-
+    
     if (isOccupied != _lastState)
     {
         _startTime = millis();

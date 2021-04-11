@@ -23,7 +23,7 @@ public:
 
 private:
     bool _inverted;
-    bool _relayPin;
+    int _relayPin;
     bool _state;
     bool _activate;
 };

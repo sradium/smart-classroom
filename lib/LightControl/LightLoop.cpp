@@ -5,7 +5,7 @@ Loop::Loop()
     _init = false;
 }
 
-Loop::Loop(double* setpoint, int pinInput, int dacOutput, int kp, int ki, int kd, bool priority)
+Loop::Loop(double* setpoint, uint8_t  pinInput, int dacOutput, int kp, int ki, int kd, bool priority)
 {
     _setpoint = setpoint;
     _pinInput = pinInput;
@@ -17,12 +17,18 @@ Loop::Loop(double* setpoint, int pinInput, int dacOutput, int kp, int ki, int kd
     _controller = &controller;
     _controller->SetOutputLimits(0, 4095);
     _controller->SetMode(AUTOMATIC);
+    Serial.print("\t\tCreated loop in pin: ");
+    Serial.print(pinInput);
+    Serial.print(" ");
+    Serial.println(dacOutput);
+    _init = true;
 }
 
 void Loop::compute()
 {
     if (_init){
-        _input = analogRead(_pinInput);
+        _input = analogRead(_pinInput)*5.0/1024.0;
+        _input = 1000*log(_input+1);
         if (_enable)
         {
             _controller->Compute();
@@ -33,14 +39,18 @@ void Loop::compute()
 
 void Loop::start()
 {
-    if (!_enable and _init)
+    if (!_enable and _init){
         _enable = true;
+        Serial.println("LOOP started");
+    }
 }
 
 void Loop::stop()
 {
-    if (_enable)
+    if (_enable){
         _enable = false;
+        Serial.println("LOOP stoped");
+    }
 }
 
 void Loop::stopNotPriority()

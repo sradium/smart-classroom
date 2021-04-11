@@ -25,8 +25,10 @@ Relay::Relay(int relayPin, bool inverted)
     _activate = true;
     _relayPin = relayPin;
     _inverted = inverted;
-    _state = false;
+    _state = LOW;
     pinMode(relayPin, OUTPUT);
+    Serial.print("\nRelay created on pin ");
+    Serial.println(relayPin);
 }
 
 bool Relay::getState()
@@ -44,45 +46,19 @@ void Relay::turnOn()
 {
     if (_activate)
     {
-        if (_inverted)
-        {
-            if (!_state)
-            {
-                return;
-            }
-            _state = false;
-        }
-        else
-        {
-            if (_state)
-            {
-                return;
-            }
-            _state = true;
-        }
-        digitalWrite(_relayPin, _state);
+        digitalWrite(_relayPin, HIGH);
+        Serial.print("relay ");
+        Serial.print(_relayPin);
+        Serial.println(" turn on");
     }
 }
 void Relay::turnOff()
 {
     if (_activate)
     {
-        if (_inverted)
-        {
-            if (_state)
-            {
-                return;
-            }
-            _state = true;
-        }
-        else
-        {
-            if (!_state)
-            {
-                return;
-            }
-            _state = false;
-        }
-        digitalWrite(_relayPin, _state);
+        digitalWrite(_relayPin, LOW);
+        Serial.print("relay ");
+        Serial.print(_relayPin);
+        Serial.println(" turn off");
     }
 }

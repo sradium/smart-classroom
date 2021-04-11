@@ -20,6 +20,10 @@ Stepper::Stepper(int pin_on, int pin_dir) {
     _pinDir = pin_dir;
     isMove = false; 
     down = LOW;
+    Serial.print("Stepper created on pins: ");
+    Serial.print(pin_on);
+    Serial.print(" ");
+    Serial.println(pin_dir);
 }
 
 Stepper::Stepper()

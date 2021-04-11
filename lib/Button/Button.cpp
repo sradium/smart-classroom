@@ -14,24 +14,14 @@
  */
 #include "Button.h"
 
-typeEdge convertFromStrEdge(const char* edge)
+bool convertFromStrToLogic(int mode_logic)
 {
-    if (edge == "NONE")
-        return NONE;
-    else if (edge == "RISING EDGE")
-        return RISING_EDGE;
-    else if (edge == "FALLING EDGE")
-        return FALLING_EDGE;
-    else if (edge == "BOTH EDGE")
-        return BOTH_EDGE;
-}
-
-bool convertFromStrToLogic(const char* mode_logic)
-{
-    if (mode_logic == "NO")
+    if (mode_logic == 0){
         return false;
-    else if (mode_logic == "NC")
+    }
+    else {
         return true;
+    }   
 }
 
 Button::Button()
@@ -42,6 +32,7 @@ Button::Button()
 Button::Button(int buttonPin, bool inverted)
 {
     init(buttonPin, inverted);
+    _debounceDelay = 500;
 }
 
 Button::Button(int buttonPin, bool inverted, unsigned long delay)
@@ -50,22 +41,18 @@ Button::Button(int buttonPin, bool inverted, unsigned long delay)
     _debounceDelay = delay;
 }
 
-Button::Button(int buttonPin, bool inverted, typeEdge edge, void (*callback)())
-{
-    init(buttonPin, inverted);
-    _changeEdge = edge;
-    _callback = callback; 
-}
-
 void Button::init(int buttonPin, bool inverted)
 {
     _activate = true;
     _buttonPin = buttonPin;
     _inverted = inverted;
-    _buttonState = _inverted;
+    _buttonState = LOW;
     _lastButtonState = _buttonState;
     _changeEdge = NONE;
+    _lastDebounceTime = 0;
     pinMode(_buttonPin, INPUT);
+    Serial.print("\nButton created on pin ");
+    Serial.println(_buttonPin);
 }
 
 void Button::setDelay(unsigned long delay_seg)
@@ -80,7 +67,7 @@ bool Button::read()
         return false;
     }
 
-    int reading = digitalRead(_buttonPin) ^ _inverted;
+    int reading = digitalRead(_buttonPin);
 
     if (reading != _lastButtonState)
     {
@@ -93,24 +80,19 @@ bool Button::read()
         {
             if (reading && _changeEdge == RISING_EDGE)
             {
-                _callback();
             }
             else if (!reading && _changeEdge == FALLING_EDGE)
             {
-                _callback();
             }
             else if (_changeEdge == BOTH_EDGE)
             {
-                _callback();
             }
             else
             {
             }
-
             _buttonState = reading;
         }
     }
-
     _lastButtonState = reading;
     return _buttonState;
 }

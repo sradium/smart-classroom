@@ -1,0 +1,71 @@
+{
+    "illuminationEquipment": {
+        "off_delay_min": 15,
+        "scenes": {
+            "setpoint": 300,
+            "highest": 100,
+            "high": 70,
+            "medium": 45,
+            "low": 10
+        },
+        "projector": true,
+        "pir": [14, 15, 16],
+        "loops": [{
+                "terminal": 1,
+                "priority": false,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": 2,
+                "priority": false,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": 3,
+                "priority": false,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": 4,
+                "priority": false,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": 5,
+                "priority": true,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": 6,
+                "priority": true,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": 7,
+                "priority": true,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            },
+            {
+                "terminal": 8,
+                "priority": true,
+                "kp": 20,
+                "ki": 12,
+                "kd": 0.12
+            }
+        ]
+    }
+}

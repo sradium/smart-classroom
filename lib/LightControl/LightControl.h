@@ -16,18 +16,6 @@
 #include "Button.h"
 #include "Curtain.h"
 
-enum sensorTerminals
-{
-    LLS0 = 0,
-    LLS1 = A8,
-    LLS2 = A9,
-    LLS3 = A10,
-    LLS4 = A11,
-    LLS5 = A12,
-    LLS6 = A13,
-    LLS7 = A14,
-    LLS8 = A15
-};
 
 enum loopTerminals
 {
@@ -42,15 +30,6 @@ enum loopTerminals
     LL8 = 0x67
 };
 
-enum pirTerminals
-{
-    LP0 = 0,
-    LP1 = 14,
-    LP2 = 15,
-    LP3 = 16,
-    LP4 = 17
-};
-
 struct scenes
 {
     double setpoint;
@@ -59,7 +38,6 @@ struct scenes
     int medium;
     int low;
 };
-
 
 /*
 * Estructura con la asiganción de pines para el projector:
@@ -71,7 +49,7 @@ struct scenes
 */
 struct projector
 {
-    int PI = 18;
+    int PinI = 18;
     int PLSU = 19;
     int PLSB = 20;
     int PSMP = 21;
@@ -96,7 +74,7 @@ private:
     scenes levelLighting;
     projector projectorPinout;
     Button ldr;
-    Button PIRs[3];
+    Button PIRs[4];
     Loop loops[8];
     Curtain projectionScreen;
 };

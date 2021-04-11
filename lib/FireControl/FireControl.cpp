@@ -15,40 +15,16 @@
 
 #include "FireControl.h"
 
-terminals convertFromStrTerminal(String terminal)
-{
-    if (terminal == "FI1")
-        return FI1;
-    else if (terminal == "FI2")
-        return FI3;
-    else if (terminal == "FI3")
-        return FI3;
-    else if (terminal == "FI4")
-        return FI4;
-    else if (terminal == "FI5")
-        return FI5;
-    else if (terminal == "FI6")
-        return FI6;
-    else
-        return FI0;
-}
-
 FireControler::FireControler(JsonArray FireEquipment)
 {
     init(FireEquipment);
-}
-
-FireControler::FireControler(JsonArray FireEquipment, void (*callback)())
-{
-    init(FireEquipment);
-    _callback = callback;
-    _isCallback = true;
 }
 
 void FireControler::init(JsonArray FireEquipment)
 {
     int sensorIndex = 0;
     int actuatorIndex = 0;
+    Serial.println("Creating fire equipment");
     for(JsonObject equipment : FireEquipment)
     {
         if (equipment["type"] == "sensor")
@@ -56,7 +32,7 @@ void FireControler::init(JsonArray FireEquipment)
             if (sensorIndex < 6)
             {
                 _sensors[sensorIndex] = Button(
-                    static_cast<int>(convertFromStrTerminal(equipment["terminal"])),
+                    static_cast<int>(equipment["terminal"]),
                     convertFromStrToLogic(equipment["mode"]),
                     (static_cast<long>(equipment["debounce_seg"]) * 1000)
                 );
@@ -70,25 +46,24 @@ void FireControler::init(JsonArray FireEquipment)
             if (actuatorIndex < 3)
             {
                 _actuators[actuatorIndex] = Relay(
-                    static_cast<int>(convertFromStrTerminal(equipment["terminal"])),
+                    static_cast<int>(equipment["terminal"]),
                     convertFromStrToLogic(equipment["mode"])
                 );
                 actuatorIndex++;
             } else
             {
-                Serial.println("Alarm actuator limir exceeded.");
+                Serial.println("Alarm actuator limit exceeded.");
             }
         } else {
         }
     }
-    _isCallback = false;
 }
 
 void FireControler::superviseSensors()
 {
     bool isAlarm = false;
     for(int i=0; i<6; i++){
-        isAlarm = _sensors[i].read() | isAlarm;
+        isAlarm = _sensors[i].read() || isAlarm;
     }
 
     if (isAlarm != _lastState)
@@ -115,19 +90,17 @@ void FireControler::superviseSensors()
 
 void FireControler::activateAlarm()
 {
+    Serial.println("Alarma de fuego activada");
     fireAlarm = true;
     for (int i=0; i<3; i++)
     {
         _actuators[i].turnOn();
     }
-    if (_isCallback)
-    {
-        _callback();
-    }
 }
 
 void FireControler::deactivateAlarm()
 {
+    Serial.println("Alarma de fuego desactivada");
     fireAlarm = false;
     for (int i=0; i<3; i++)
     {

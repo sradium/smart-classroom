@@ -9,6 +9,50 @@ Sistema de control de un salón de la Universidad Metropolitana que regula la il
 * [Ethernet](https://www.arduino.cc/en/Reference/Ethernet): Librerías diseñada para gestionar la conexión a internet con shields basados en los integrados **Wiznet W5100/W5200/W5500**.
 * [PubSubClient](https://pubsubclient.knolleary.net/): Esta librería provee un cliente para la publicación y suscripción de mensajes a un Broker [MQTT](https://mqtt.org/).
 
+## ASIGNACIÓN DE PINES
+    FI1 = 3,
+    FI2 = 4,
+    FI3 = 5,
+    FI4 = 6,
+    FI5 = 7,
+    FI6 = 8,
+    FO1 = 11,
+    FO2 = 12,
+    FO3 = 13
+
+    PinI = 18;
+    PLSU = 19;
+    PLSB = 20;
+    PSMP = 21;
+    PSMD = 22;
+
+    VMS1 = A3,
+    VMS2 = A4,
+    VMS3 = A5
+
+    PIR1 = 14,
+    PIR2 = 15,
+    PIR3 = 16,
+    PIR4 = 17
+
+    LLS1 = A8,
+    LLS2 = A9,
+    LLS3 = A10,
+    LLS4 = A11,
+    LLS5 = A12,
+    LLS6 = A13,
+    LLS7 = A14,
+    LLS8 = A15
+
+    LL1 = 0x60,
+    LL2 = 0x61,
+    LL3 = 0x62,
+    LL4 = 0x63,
+    LL5 = 0x64,
+    LL6 = 0x65,
+    LL7 = 0x66,
+    LL8 = 0x67
+
 ## EJEMPLO DE CONFIGURACION 
 
 Con la finalidad de adaptar el sistema a las distintas características de los salones, se utiliza un lector de tarjetas micro SD por medio de una interfaz SPI para cargar la configuración específica de un salón. Para conocer el diagrama de conexión dirígase a la sección de [descripción del hardware](#DESCRIPCION-DEL-HARDWARE). La micro tarjeta SD contiene un archivo de configuración `configuration.json` que posee la siguiente estructura:
@@ -23,7 +67,11 @@ Con la finalidad de adaptar el sistema a las distintas características de los s
         "client_id":"A1314",
         "intervarl_publish_min": 5,
         "port": 1883
-    },
+    }
+}
+```
+``` json
+{
     "illuminationEquipment":{
         "off_delay_min": 15,
         "scenes":{
@@ -34,93 +82,98 @@ Con la finalidad de adaptar el sistema a las distintas características de los s
             "low": 10
         },
         "projector": true,
-        "pir": ["LP1", "LP2", "LP3"],
+        "pir": [14, 15, 16],
         "loops":[
             {
-                "terminal": "LL1",
+                "terminal": 1,
                 "priority": false,
                 "kp": 20,
                 "ki": 12,
                 "kd": 0.12
             },
             {
-                "terminal": "LL2",
+                "terminal": 2,
                 "priority": false,
                 "kp": 20,
                 "ki": 12,
                 "kd": 0.12
             },
             {
-                "terminal": "LL3",
+                "terminal": 3,
                 "priority": false,
                 "kp": 20,
                 "ki": 12,
                 "kd": 0.12
             },
             {
-                "terminal": "LL4",
+                "terminal": 4,
                 "priority": false,
                 "kp": 20,
                 "ki": 12,
                 "kd": 0.12
             },
             {
-                "terminal": "LL5",
+                "terminal": 5,
                 "priority": true,
                 "kp": 20,
                 "ki": 12,
                 "kd": 0.12
             },
             {
-                "terminal": "LL6",
+                "terminal": 6,
                 "priority": true,
                 "kp": 20,
                 "ki": 12,
                 "kd": 0.12
             },
             {
-                "terminal": "LL7",
+                "terminal": 7,
                 "priority": true,
                 "kp": 20,
                 "ki": 12,
                 "kd": 0.12
             },
             {
-                "terminal": "LL8",
+                "terminal": 8,
                 "priority": true,
-                "kp": 20,
+                "kp":  20,
                 "ki": 12,
                 "kd": 0.12
             }
         ]
-    },
+    }
+}
+```
+
+```json
+{
     "FireEquipment":[
         {
             "name": "emergency lever",
             "type": "sensor",
             "mode": "NO",
-            "terminal": "FI1",
+            "terminal": 13,
             "debounce_seg": 0.5
         },
         {
             "name": "smoke detector",
             "type": "sensor",
             "mode": "NO",
-            "terminal": "FI2",
+            "terminal": 12,
             "debounce_seg": 5
         },
         {
             "name": "smoke detector 2",
             "type": "sensor",
             "mode": "NO",
-            "terminal": "FI3",
+            "terminal": 11,
             "debounce_seg": 5
         },
         {
             "name": "Siren",
             "type": "actuator",
             "mode": "NO",
-            "terminal": "FO1"
+            "terminal": 7
         }
     ]
 }

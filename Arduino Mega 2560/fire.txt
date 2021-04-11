@@ -1,0 +1,30 @@
+{
+    "FireEquipment": [{
+            "name": "emergency lever",
+            "type": "sensor",
+            "mode": 0,
+            "terminal": 5,
+            "debounce_seg": 0.5
+        },
+        {
+            "name": "smoke detector",
+            "type": "sensor",
+            "mode": 0,
+            "terminal": 4,
+            "debounce_seg": 0.5
+        },
+        {
+            "name": "smoke detector 2",
+            "type": "sensor",
+            "mode": 0,
+            "terminal": 3,
+            "debounce_seg": 0.5
+        },
+        {
+            "name": "Siren",
+            "type": "actuator",
+            "mode": 0,
+            "terminal": 7
+        }
+    ]
+}

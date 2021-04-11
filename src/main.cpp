@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
-#include <Ethernet.h>
+#include <UIPEthernet.h>
 #include <PubSubClient.h>
 #include <FireControl.h>
 #include <LightControl.h>
@@ -33,48 +33,71 @@ void on_message(char* topic, byte* payload, unsigned int length) {
   Serial.println();
 }
 
+void load_conf() {
+  Serial.println(); 
+  File file = SD.open("FIRE.txt");
+  if (!file) {
+    Serial.println(F("Failed to read file"));
+    while(true);
+  }
+  StaticJsonDocument<384> doc;
+  DeserializationError error = deserializeJson(doc, file);
+  if (error){
+    Serial.println(F("Failed to read file, using default configuration"));
+    Serial.println(error.f_str());
+    while(true);
+  }
+  JsonArray FireEquipment = doc["FireEquipment"];
+  fireControler = FireControler(FireEquipment);
+  delay(15);
+  file.close();
+
+  Serial.println();  
+  File file2 = SD.open("ILLUM.txt");
+  if (!file2) {
+    Serial.println(F("Failed to read file"));
+    while(true);
+  }
+  StaticJsonDocument<768> doc2;
+  error = deserializeJson(doc2, file2);
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    while(true);
+  }
+  JsonObject illuminationEquipment = doc2["illuminationEquipment"];
+  ligthControler = LigthControler(illuminationEquipment);
+  delay(15);
+}
 
 void setup()
 {
   Serial.begin(9600);
 
-  fireControler = FireControler();
-  ligthControler = LigthControler();
-
-  Serial.println("Initialize Ethernet with DHCP:");
+  Serial.println("Initialize Ethernet");
   Ethernet.init(53);
-  if (Ethernet.begin(mac) == 0)
-  {
-    Serial.println("Failed to configure Ethernet using DHCP");
-    if (Ethernet.hardwareStatus() == EthernetNoHardware)
-    {
-      Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware");
-      while (true)
-        ;
-    }
-    else if (Ethernet.linkStatus() == LinkOFF)
-    {
-      Serial.println("Ethernet cable is not connected");
-    }
-    else
-    {
-      Ethernet.begin(mac, ip, myDns);
-      Serial.println("My IP address: ");
-      Serial.println(Ethernet.localIP());
-    }
+  Ethernet.begin(mac, ip, myDns);
+  Serial.println("My IP address: ");
+  Serial.println(Ethernet.localIP());
+  
+  Serial.println();
+  Serial.print("Initializing SD card...");
+  if (!SD.begin(10)) {
+    Serial.println("initialization failed. Things to check:");
+    Serial.println("1. is a card inserted?");
+    Serial.println("2. is your wiring correct?");
+    Serial.println("3. did you change the chipSelect pin to match your shield or module?");
+    Serial.println("Note: press reset or reopen this serial monitor after fixing your issue!");
+    while (true);
   }
-  else
-  {
-    Serial.println("DHCP assigned IP ");
-    Serial.println(Ethernet.localIP());
-  }
-  delay(1500);
+  Serial.println("initialization done.");
+  load_conf();
+  Serial.println();
 
   mqttClient.setServer(server, port);
   mqttClient.setCallback(on_message);
-
   last_publish = millis();
-  interval_publish = 60000L * 1L;
+  interval_publish = 300000L * 1L;
 }
 
 
@@ -89,7 +112,7 @@ void reconnect(){
     mqttClient.subscribe(topic);
   } else {
     Serial.print("failed, rc=");
-    Serial.print(mqttClient.state());
+    Serial.println(mqttClient.state());
   }
 }
 
@@ -197,7 +220,7 @@ void loop()
   ligthControler.superviseLoops();
 
   if (!mqttClient.connected()) {
-    reconnect();
+    // reconnect();
   } else {
     if(millis() - last_publish > interval_publish){
       report_status();

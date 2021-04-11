@@ -18,7 +18,7 @@ class Loop
 {
 public:
     Loop();
-    Loop(double* setpoint, int pinInput, int dacOutput, int kp, int kd, int ki, bool priority);
+    Loop(double* setpoint, uint8_t  pinInput, int dacOutput, int kp, int kd, int ki, bool priority);
     void compute();
     void stop();
     void start();
@@ -27,7 +27,7 @@ private:
     bool _init;
     bool _enable;
     bool _priority;
-    int _pinInput;
+    uint8_t  _pinInput;
     double*  _setpoint;
     double  _input;
     double  _output;
